@@ -5,7 +5,6 @@ Servo myServo;
 const int joyPinX = A0;       // Connect joystick X-axis to A0
 const int joyPinY = A1;       // Connect joystick Y-axis to A1
 const int servoPin = 9;       // Connect servo signal to pin 9
-const int laserPin = 10;      // Connect laser module to pin 10
 const int pushButtonPin = 7;  // Connect push-button module to pin 7
 
 bool toggleState = false;     // Variable to store toggle state
@@ -16,7 +15,6 @@ int fineTuneValue = 0;        // Fine-tune adjustment value
 
 void setup() {
   myServo.attach(servoPin);
-  pinMode(laserPin, OUTPUT);
   pinMode(pushButtonPin, INPUT_PULLUP); // Assuming the button is connected to pin 7 and has a pull-up resistor
   Serial.begin(9600);
 }
@@ -49,7 +47,6 @@ void loop() {
   // If the servo is locked, set the angle to the locked angle with fine-tuning
   if (toggleState) {
     myServo.write(lockedAngle + fineTuneValue);
-    digitalWrite(laserPin, HIGH); // Turn on the laser module when locked
   } else {
     // Map the joystick values (0-1023) to servo angle (30-150) with fine-tuning
     int servoAngle = map(joyValueX, 502, 1023, 30, 140) + fineTuneValue;
@@ -57,8 +54,6 @@ void loop() {
     // Move the servo to the mapped angle
     myServo.write(servoAngle);
     currentAngle = servoAngle; // Update current angle
-
-    digitalWrite(laserPin, joyValueX > 800 ? HIGH : LOW); // Turn on the laser module when joystick position is above the threshold
   }
 
   // Print values for debugging
@@ -68,8 +63,6 @@ void loop() {
   Serial.print(joyValueY);
   Serial.print(" | Servo Angle: ");
   Serial.print(myServo.read());  // Print the current servo angle
-  Serial.print(" | Laser: ");
-  Serial.print(digitalRead(laserPin) == HIGH ? "ON" : "OFF");
   Serial.print(" | Toggle State: ");
   Serial.println(toggleState ? "Locked" : "Unlocked");
 
